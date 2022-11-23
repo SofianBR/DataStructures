@@ -2,7 +2,7 @@ public class LinkedList<T> {
 
     /**
      * Author: Sofian Ben Hamman
-     * Version: 1.1
+     * Version: 1.2
      * Description: Own implementation of a single LinkedList.
      */
 
@@ -14,6 +14,19 @@ public class LinkedList<T> {
 
     }
 
+    /**
+     * Returns the number of elements in the list.
+     * @return
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Returns the value at the specified position in the list.
+     * @param index
+     * @return
+     */
     public T get(int index) {
         return getNodeHelper(index).getValue();
     }
@@ -24,41 +37,47 @@ public class LinkedList<T> {
             throw new IndexOutOfBoundsException();
         }
         Node<T> iteratorNode = head;
-        while (iteratorNode != null) {
-            if (currentIndex == targetIndex) {
-                return iteratorNode;
-            }
+        while (currentIndex != targetIndex) {
             iteratorNode = iteratorNode.getNextNode();
             currentIndex++;
         }
-        return null;
+        return iteratorNode;
     }
 
+    /**
+     * Appends the element at the end of the list.
+     * @param value
+     */
     public void add(T value) {
+        size++;
         if (head == null) {
             head = new Node<T>();
             head.setValue(value);
             tail = head;
-            size++;
             return;
         }
-        head.setNextNode(addHelper(value, head.getNextNode()));
+        Node<T> node = new Node<T>();
+        node.setValue(value);
+        tail.setNextNode(node);
+        tail = tail.getNextNode();
     }
 
-    private Node<T> addHelper(T value, Node<T> currentNode) {
-        if (currentNode == null) {
-            currentNode = new Node<T>();
-            currentNode.setValue(value);
-            tail = currentNode;
-            size++;
-            return currentNode;
+    /**
+     * Removes the element at the specified position in the list.
+     * @param targetIndex
+     */
+    public void remove(int targetIndex) {
+        int currentIndex = 0;
+        if (targetIndex >= size || targetIndex < currentIndex) {
+            throw new IndexOutOfBoundsException();
         }
-        currentNode.setNextNode(addHelper(value, currentNode.getNextNode()));
-        return currentNode;
+        size--;
+        if (targetIndex == 0) {
+            head = head.getNextNode();
+            return;
+        }
+        Node<T> previousNode = getNodeHelper(targetIndex - 1);
+        Node<T> nextNode = previousNode.getNextNode().getNextNode();
+        previousNode.setNextNode(nextNode);
     }
-
-    public int size() {
-        return size;
-    }
-
 }
