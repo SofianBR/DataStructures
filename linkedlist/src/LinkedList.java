@@ -16,7 +16,7 @@ public class LinkedList<T> {
 
     /**
      * Returns the number of elements in the list.
-     * @return
+     * @return The number of elements in the list.
      */
     public int size() {
         return size;
@@ -25,7 +25,7 @@ public class LinkedList<T> {
     /**
      * Returns the value at the specified position in the list.
      * @param index
-     * @return
+     * @return The value at the specified position in the list.
      */
     public T get(int index) {
         return getNodeHelper(index).getValue();
@@ -46,7 +46,7 @@ public class LinkedList<T> {
 
     /**
      * Appends the element at the end of the list.
-     * @param value
+     * @param value: Value to append in the list.
      */
     public void add(T value) {
         size++;
@@ -64,7 +64,7 @@ public class LinkedList<T> {
 
     /**
      * Removes the element at the specified position in the list.
-     * @param targetIndex
+     * @param targetIndex: Index to remove from the list if it is present.
      */
     public void remove(int targetIndex) {
         int currentIndex = 0;
