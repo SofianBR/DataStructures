@@ -2,7 +2,7 @@ public class LinkedList<T> {
 
     /**
      * Author: Sofian Ben Hamman
-     * Version: 1.3
+     * Version: 1.4
      * Description: Own implementation of a single LinkedList.
      */
 
@@ -24,7 +24,7 @@ public class LinkedList<T> {
 
     /**
      * Returns the value at the specified position in the list.
-     * @param index
+     * @param index: The specified index.
      * @return The value at the specified position in the list.
      */
     public T get(int index) {
@@ -32,14 +32,12 @@ public class LinkedList<T> {
     }
 
     private Node<T> getNodeHelper(int targetIndex) {
-        int currentIndex = 0;
-        if (targetIndex >= size || targetIndex < currentIndex) {
+        if (targetIndex >= size || targetIndex < 0) {
             throw new IndexOutOfBoundsException();
         }
         Node<T> iteratorNode = head;
-        while (currentIndex != targetIndex) {
+        for (int i = 0; i < targetIndex; i++) {
             iteratorNode = iteratorNode.nextNode;
-            currentIndex++;
         }
         return iteratorNode;
     }
@@ -90,14 +88,12 @@ public class LinkedList<T> {
         if (targetIndex >= size || targetIndex < 0) {
             throw new IndexOutOfBoundsException();
         }
-        Node<T> newNode = new Node<>();
-        newNode.value = value;
         if (targetIndex == 0) {
-            newNode.nextNode = head;
-            head = newNode;
-            size++;
+            addFirst(value);
             return;
         }
+        Node<T> newNode = new Node<>();
+        newNode.value = value;
         Node<T> previousNode = getNodeHelper(targetIndex - 1);
         Node<T> nextNode = previousNode.nextNode;
         previousNode.nextNode = newNode;
