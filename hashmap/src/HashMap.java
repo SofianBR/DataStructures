@@ -1,19 +1,48 @@
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class HashMap<K, V> {
 
     /**
      * Author: Sofian Ben Hamman
-     * Version: 1.1
+     * Version: 1.2
      * Description: Own implementation of a HashMap.
      */
 
-    private Bucket<K, V> bucket;
+    private int size;
+    private int capacity;
+    private int thresholdValue;
+    private LinkedList<KeyValueEntry<K, V>>[] entries;
+    private final float LOAD_FACTOR = 0.75f;
 
     public HashMap() {
-        bucket = new Bucket<K, V>();
+        size = 0;
+        capacity = 16;
+        thresholdValue = (int)(capacity * LOAD_FACTOR);
+        entries = new LinkedList[capacity];
+    }
+
+    private int hashFunction(int hash) {
+        return hash & (capacity - 1);
+    }
+
+    private void resizeAndRehash() {
+        if (size < thresholdValue) {
+            return;
+        }
+        capacity *= 2;
+        LinkedList<KeyValueEntry<K, V>>[] copy = entries;
+        entries = new LinkedList[capacity];
+        for (LinkedList<KeyValueEntry<K, V>> copyListBucket : copy) {
+            if (copyListBucket != null) {
+                for (KeyValueEntry<K, V> entry : copyListBucket) {
+                    int index = hashFunction(entry.getHash());
+                    if (entries[index] == null) {
+                        entries[index] = new LinkedList<>();
+                    }
+                    entries[index].add(entry);
+                }
+            }
+        }
     }
 
     /**
@@ -23,7 +52,24 @@ public class HashMap<K, V> {
      */
     public void put(K key, V value) {
         KeyValueEntry<K, V> entry = new KeyValueEntry<>(key, value);
-        bucket.addEntry(entry);
+        int index = hashFunction(entry.getHash());
+        if (entries[index] == null) {
+            entries[index] = new LinkedList<>();
+        }
+        boolean found = false;
+        Iterator<KeyValueEntry<K, V>> it = entries[index].iterator();
+        while (!found && it.hasNext()) {
+            KeyValueEntry<K, V> node = it.next();
+            if (node.equals(entry)) {
+                node.setValue(entry.getValue());
+                found = true;
+            }
+        }
+        if (!found) {
+            entries[index].add(entry);
+            size++;
+        }
+        resizeAndRehash();
     }
 
     /**
@@ -33,7 +79,14 @@ public class HashMap<K, V> {
      * @return Value to which the specified key is mapped to, or 'null' if there is no mapping on the given key.
      */
     public V get(K key) {
-        return bucket.getEntry(key);
+        int keyHash = Objects.hashCode(key);
+        int index = hashFunction(keyHash);
+        for (KeyValueEntry<K, V> entry : entries[index]) {
+            if (Objects.equals(keyHash, entry.getHash())) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     /**
@@ -42,7 +95,27 @@ public class HashMap<K, V> {
      * @return True if the mapping is removed, false otherwise.
      */
     public boolean remove(K key) {
-        return bucket.removeEntry(key);
+        int keyHash = Objects.hashCode(key);
+        int index = hashFunction(keyHash);
+        int i = 0;
+        boolean found = false;
+        while (!found && i < size) {
+            KeyValueEntry<K, V> entry = entries[index].get(i);
+            if (Objects.equals(keyHash, entry.getHash())) {
+                entries[index].remove(i);
+                found = true;
+            }
+            i++;
+        }
+        return found;
+    }
+
+    /**
+     * Returns A LinkedList of the pairs values in the map.
+     * @return A LinkedList of the entries contained in the map.
+     */
+    public LinkedList<KeyValueEntry<K, V>>[] getEntries() {
+        return entries;
     }
 
     /**
@@ -51,12 +124,66 @@ public class HashMap<K, V> {
      */
     public Set<KeyValueEntry<K, V>> entrySet() {
         Set<KeyValueEntry<K, V>> entrySet = new HashSet<>();
-        for (LinkedList<KeyValueEntry<K, V>> listBucket : bucket.getEntries()) {
+        for (LinkedList<KeyValueEntry<K, V>> listBucket : entries) {
             if (listBucket != null) {
                 entrySet.addAll(listBucket);
             }
         }
         return entrySet;
+    }
+
+    private static class KeyValueEntry<K, V> {
+
+        /**
+         * This class represents the pair of values (key, value).
+         */
+
+        private K key;
+        private V value;
+        private int hash;
+
+        public KeyValueEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+            this.hash = hashCode();
+        }
+
+        public K getKey() {
+            return this.key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
+        }
+
+        public V getValue() {
+            return this.value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public int getHash() {
+            return this.hash;
+        }
+
+        public void setHash(int hash) {
+            this.hash = hash;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            KeyValueEntry<?, ?> that = (KeyValueEntry<?, ?>) o;
+            return Objects.equals(hash, that.hash);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(key);
+        }
     }
 
 }
