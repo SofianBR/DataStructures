@@ -103,7 +103,7 @@ public class LinkedList<T> {
 
     /**
      * Removes the element at the specified position in the list.
-     * @param targetIndex: Index to remove from the list if it is present.
+     * @param targetIndex: Index to remove from the list if it's present.
      */
     public void remove(int targetIndex) {
         int currentIndex = 0;
